@@ -125,7 +125,7 @@ class Login_out extends JFrame{
 
             public JButton[] bt = new JButton[25];
             void button(){
-                for (int i = 1 ; i<= 24 ; i++){
+                for (int i = 0 ; i<= 24 ; i++){
                     bt[i]= new JButton(i+"");
                 }
             }
@@ -252,7 +252,7 @@ class Login_out extends JFrame{
 
                     ResultSet rs = pstmt.executeQuery();
 
-                 while (rs.next()){
+                 while (rs.next()){// 자리가 있는 자리는 붉은 색으로 변경해서 표시
                        int btnum = rs.getInt(7);
                       bt[btnum].setBackground(Color.red);
                  }
@@ -282,7 +282,13 @@ class Login_out extends JFrame{
                 private  JLabel pri= new JLabel();
                 private JButton button_ok = new JButton("확인");
 
+//////////////////////////////////////////////////SEATFULL
+                private  JFrame frame = new JFrame();
+                private JLabel label = new JLabel();
+                private JButton del = new JButton("자리빼기");
 
+                private JLabel seat = new JLabel("내 좌석: ");
+                private JLabel seat_mine = new JLabel();//현재 사용중인 자신의 좌석
 
 
                 @Override
@@ -302,7 +308,46 @@ class Login_out extends JFrame{
                             String bt_num = btnum+"";
                             if (bt_num.equals(input)){
                                 if (bt[btnum].getBackground() == Color.red) {
-                                    new Fullseat();
+                                    frame.setLayout(null);
+                                    label.setText(" 이미 사용중인 좌석입니다.");
+                                    label.setBounds(50,5,200,30);
+                                    frame.add(label);
+                                    //////////////
+
+                                    seat.setBounds(50, 35, 50, 30);
+                                    frame.add(seat);
+
+                                    try {
+
+                                        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/new_schema", "root", "1234");
+                                        pstmt = conn.prepareStatement("select * from test where id=?;");
+
+                                        pstmt.setString(1, idText.getText());
+                                        ResultSet rs2 = pstmt.executeQuery();
+
+                                        while (rs2.next()) {
+                                            seat_mine.setText(rs2.getString("num"));
+                                        }
+
+                                    } catch (SQLException e1) {
+                                        e1.printStackTrace();
+                                    }
+
+
+                                    seat_mine.setBounds(100, 35, 50, 30);
+                                    frame.add(seat_mine);
+
+                                    ///////////////
+                                    del.setBounds(80, 100, 100, 30); //자리 빼기 위치 선정
+                                    frame.add(del);
+
+                                    del.addActionListener(new Fullseat());
+
+
+                                    frame.setSize(300, 200);
+                                    frame.setTitle("오류창");
+                                    frame.setVisible(true);
+
                                 }
                             }
 
@@ -440,7 +485,7 @@ class Login_out extends JFrame{
 
 
 //로그인 창을 만들자. 회원가입해서 기본 정보를 넣고.
-class Login extends JFrame implements ActionListener {
+class Login extends JFrame implements ActionListener {//로그인 시작 창 및 회원가입
 
     private static Connection conn;
     private static PreparedStatement pstmt;
@@ -474,7 +519,7 @@ class Login extends JFrame implements ActionListener {
     JButton check_pass = new JButton("중복 확인");
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {//회원가입창
         setLayout(null);
 
 
@@ -482,13 +527,13 @@ class Login extends JFrame implements ActionListener {
         idtext.setBounds(100, 10, 130, 30);
         checkin.setBounds(250, 10, 100, 30);
         id_check.setBounds(100, 50, 200, 20);
-        add(id);
-        add(idtext);
-        add(checkin);
-        add(id_check);
+        add(id); //아이디 입력 라벨
+        add(idtext);//아이디 입력
+        add(checkin);//아이디 체크 버튼
+        add(id_check); //아이디 확인 후 중복인지 내용 뜨는 부분
 
-        id_check.setForeground(Color.red);
-        checkin.addActionListener(new CheckId());
+        id_check.setForeground(Color.red);//중복 내용 체크 부분을 빨강으로 표시
+        checkin.addActionListener(new CheckId());//중복 체크를 누를 경우 checkId로 가서 아이디 중복 체크
 
         //////////////////////////////////////////////////
 
@@ -572,7 +617,7 @@ class Login extends JFrame implements ActionListener {
         // 빨간색이 있는 곳엔 이미 자리가 있습니다가 뜨고, 없는 곳엔 정보 입력창이 뜨게 하려면....
 //데이터 베이스를 돌려서 기존의 이름을 돌려서 자리가 일치 할 경우 이미 자리가 차 있습니다가 뜨도록 만들면...
     }
-    class  CheckId implements ActionListener{
+    class  CheckId implements ActionListener{// checkin.addActionListener(new CheckId());에서 누르면 넘어옴
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
@@ -615,7 +660,7 @@ class Login extends JFrame implements ActionListener {
 
             try {
                 conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/new_schema", "root", "1234");
-                pstmt = conn.prepareStatement(" insert into test values (?,?,?,?, ?, ?, null);");
+                pstmt = conn.prepareStatement(" insert into test values (?,?,?,?, ?, ?, 0);");
                 pstmt.setString(1,idtext.getText());
                 pstmt.setString(2,passtext.getText());
                 pstmt.setString(3,nametext.getText());

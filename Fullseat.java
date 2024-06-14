@@ -11,51 +11,33 @@ import java.sql.SQLException;
 
 class Fullseat extends JFrame implements ActionListener {
     private JLabel label = new JLabel();
-    private JButton del = new JButton("자리빼기");
+    private JButton del = new JButton("확인");
 
+    private JTextField textField = new JTextField();
 
-    Fullseat() {
-        setLayout(null);
-        label.setText(" 이미 사용중인 좌석입니다.");
-
-        label.setBounds(50,20,200,50);
-        add(label);
-
-        del.setBounds(80, 100, 100, 30);
-
-        add(del);
-
-        del.addActionListener(this::actionPerformed);
-
-
-        setSize(300, 200);
-        setTitle("오류창");
-        setVisible(true);
-
-    }
-    JTextField textField = new JTextField();
-
-
-    private JButton check = new JButton();
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        setLayout(null);
         label.setText("전화번호를 입력하십시오.");
         label.setBounds(50, 20, 150, 20);
-
+        add(label);
+        //////////////////////////
         textField.setBounds(50,50,150,30);
         add(textField);
-
+        ////////////////////////
         del.setText("확인");
+        del.setBounds(80, 100, 100, 30);
+        add(del);
 
-        del.addActionListener((ActionListener) new delch());
+        del.addActionListener( new delch());
 
         setSize(300, 200);
         setTitle("자리 빼기");
         setVisible(true);
 
 
-        check.setBounds(80, 100, 100, 30);
+
 
     }
     class delch extends JFrame implements ActionListener{
