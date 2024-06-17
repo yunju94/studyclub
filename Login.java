@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -122,6 +123,8 @@ class Login_out extends JFrame{
 
             } catch (SQLException e1) {
                 e1.printStackTrace();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
 
             //2-1. frame과 연결
@@ -252,13 +255,26 @@ class Login_out extends JFrame{
                 bt[24].addActionListener(new Select());
 ///////////////////////////////////////////////////////////
 
+
                 timer.setBounds(180,10,100,20);
+                timer.setBackground(Color.white);
                 add(timer);
+
+                ///////////////////
+
+                JPanel lb1 = new JPanel();
+                lb1.setBackground(Color.white);
+                lb1.setBounds(0,0,500,500);
+                add(lb1);
+
+                ///////////////////////
 
                 setSize(500, 500);
                 setTitle("자리선정");
                 setVisible(true);
                 setResizable(false);
+
+
 
 
                 //  System.out.println(getBt()[0].getText());
@@ -370,6 +386,7 @@ class Login_out extends JFrame{
                                     del.addActionListener(new Fullseat());
 
 
+
                                     frame.setSize(300, 200);
                                     frame.setTitle("사용중인 좌석");
                                     frame.setVisible(true);
@@ -377,73 +394,147 @@ class Login_out extends JFrame{
 
                                 }
 
-
-
                             }else{//만약에 클릭한 좌석 번호와 sql의 번호가 없는 경우 == 아무도 선택하지 않은 좌석일 경우
 
                                 if (bt[input_int].getBackground().equals(Color.CYAN)){
                                     //클릭한 좌석의 번호의 backgrouond color가 cyan == 선택되지 않은 좌석이다.
-
                                     //자리 선정하기. 기존의 정보를 불러와서 번호만 새롭게 부여. 번호가 부여된 자리는 빨강.
                                     //1. 기존의 정보를 불러와서 번호와 함께 띄운다.
                                     //2. 확인을 누를 경우 DB에서 번호를 부여시킨다.
-
                                     //만약에 좌석이 빈 좌석이라면 좌석 예약창 뜨게 하기.
 
-                                    jFrame.setLayout(null);
+                                    try {
 
-                                    info.setBounds(150, 10, 200, 30);
-                                    jFrame.add(info);
+                                        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/new_schema", "root", "1234");
+                                        pstmt = conn.prepareStatement("select * from test where id=?;");
 
-                                    id.setBounds(20, 50, 50, 20);
-                                    jFrame.add(id);
+                                        pstmt.setString(1, idText.getText());
+                                        ResultSet rs2 = pstmt.executeQuery();
+                                        String seat_num ="";
 
-                                    id_text.setBounds(100, 50, 100, 20);
-                                    jFrame.add(id_text);
 
-                                    //////////////////////////////////////////////////////////
-                                    name.setBounds(20, 100, 100, 20);
-                                    jFrame.add(name);
+                                        while (rs2.next()) {
 
-                                    name_text.setBounds(100, 100, 100, 20);
-                                    jFrame.add(name_text);
-
-                                    ////////////////////////////////////////////////////////
-                                    tel.setBounds(15, 150, 100, 20);
-                                    jFrame.add(tel);
-
-                                    tel_text.setBounds(100, 150, 100, 20);
-                                    jFrame.add(tel_text);
-
-                                    ////////////////////////////////////////////////////////
-                                    address.setBounds(15, 200, 100, 20);
-                                    jFrame.add(address);
-
-                                    address_text.setBounds(100, 200, 100, 20);
-                                    jFrame.add(address_text);
-                                    ////////////////////////////////////////////////////////
-                                    num.setBounds(15, 250, 100, 20);
-                                    jFrame.add(num);
-
-                                    num_text.setBounds(100, 250, 100, 20);
-
-                                    for (int i = 1; i <= 24; i++) {
-                                        if (e.getSource() == bt[i]) {
-                                            num_text.setText(bt[i].getText());
+                                            seat_num = rs2.getString("num");
+                                            System.out.println(seat_num);
                                         }
+
+                                        if (seat_num.equals("0")){
+                                            System.out.println("a");
+
+
+                                            // 만약에 DB에 등록된 자리가 0인 경우
+
+                                            jFrame.setLayout(null);
+
+                                            info.setBounds(150, 10, 200, 30);
+                                            jFrame.add(info);
+
+                                            id.setBounds(20, 50, 50, 20);
+                                            jFrame.add(id);
+
+                                            id_text.setBounds(100, 50, 100, 20);
+                                            jFrame.add(id_text);
+
+                                            //////////////////////////////////////////////////////////
+                                            name.setBounds(20, 100, 100, 20);
+                                            jFrame.add(name);
+
+                                            name_text.setBounds(100, 100, 100, 20);
+                                            jFrame.add(name_text);
+
+                                            ////////////////////////////////////////////////////////
+                                            tel.setBounds(15, 150, 100, 20);
+                                            jFrame.add(tel);
+
+                                            tel_text.setBounds(100, 150, 100, 20);
+                                            jFrame.add(tel_text);
+
+                                            ////////////////////////////////////////////////////////
+                                            address.setBounds(15, 200, 100, 20);
+                                            jFrame.add(address);
+
+                                            address_text.setBounds(100, 200, 100, 20);
+                                            jFrame.add(address_text);
+                                            ////////////////////////////////////////////////////////
+                                            num.setBounds(15, 250, 100, 20);
+                                            jFrame.add(num);
+
+                                            num_text.setBounds(100, 250, 100, 20);
+
+                                            for (int i = 1; i <= 24; i++) {
+                                                if (e.getSource() == bt[i]) {
+                                                    num_text.setText(bt[i].getText());
+                                                }
+                                            }
+
+                                            jFrame.add(num_text);
+
+                                            ////////////////////////////////////////////////////////
+
+                                            button_ok.setBounds(180, 300, 80, 30);
+                                            jFrame.add(button_ok);
+                                            jFrame.add(pri);
+
+                                            jFrame.setTitle("자리 등록");
+                                            jFrame.setSize(400, 400);
+                                            jFrame.setVisible(true);
+
+
+                                        }else {
+                                            // 0이 아닌 경우
+                                            System.out.println("b");
+                                            jFrame.setLayout(null);
+
+                                            JLabel fullseat = new JLabel("이미 등록된 자리가 있습니다.");
+                                            fullseat.setBounds(0,0,400, 50);
+                                            jFrame.add(fullseat);
+
+                                            JLabel seat = new JLabel("내 자리 확인: ");
+                                            seat.setBounds(0, 50, 100, 50);
+                                            jFrame.add(seat);
+
+                                            JLabel seatnum = new JLabel();
+                                            seatnum.setBounds(100,60, 100, 30);
+                                            jFrame.add(seatnum);
+
+                                            try {
+
+                                                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/new_schema", "root", "1234");
+                                                pstmt = conn.prepareStatement("select * from test where id=?;");
+
+                                                pstmt.setString(1, idText.getText());
+                                                ResultSet rs3 = pstmt.executeQuery();
+
+                                                while (rs3.next()) {
+                                                    String mine = rs3.getString("num");
+
+                                                    seatnum.setText(mine);//"내 좌석 번호 표시"
+                                                }
+
+                                            } catch (SQLException e1) {
+                                                e1.printStackTrace();
+                                            }
+
+
+
+                                            jFrame.setTitle("자리 등록");
+                                            jFrame.setSize(300, 150);
+                                            jFrame.setVisible(true);
+                                        }
+
+
+                                    } catch (SQLException e1) {
+                                        e1.printStackTrace();
                                     }
 
-                                    jFrame.add(num_text);
 
-                                    ////////////////////////////////////////////////////////
 
-                                    button_ok.setBounds(180, 300, 80, 30);
-                                    jFrame.add(button_ok);
-                                    jFrame.add(pri);
 
-                                    jFrame.setTitle("자리 등록");
-                                    jFrame.setSize(400, 400);
-                                    jFrame.setVisible(true);
+
+
+
+
 
 
                                 }
@@ -502,7 +593,8 @@ class Login_out extends JFrame{
                             pstmt.executeUpdate();
                             pstmt.close();
 
-                            ok.setBounds(10, 10, 100, 30);
+                            setLayout(null);
+                            ok.setBounds(10, 10, 200, 30);
                             add(ok);
 
                             setSize(200,100);
@@ -527,6 +619,9 @@ class Login_out extends JFrame{
                             pstmt.close();
 
                         } catch (SQLException e1) {
+
+                            setLayout(null);
+
                             no.setBounds(10, 10, 100, 30);
                             add(no);
 
@@ -717,7 +812,9 @@ class Login extends JFrame implements ActionListener {//로그인 시작 창 및
     }
 
 
-    class UPDate implements ActionListener{
+    class UPDate extends JFrame implements ActionListener{
+
+        private  JLabel ok = new JLabel("가입이 완료 되었습니다.");
         @Override
         public void actionPerformed(ActionEvent e) {
             //입력한 정보가 DB에 올라가게.
@@ -731,11 +828,16 @@ class Login extends JFrame implements ActionListener {//로그인 시작 창 및
                 pstmt.setString(4, agetext.getText());
                 pstmt.setString(5,teltext.getText());
                 pstmt.setString(6, addresstext.getText());
-
-
                 pstmt.executeUpdate();
 
+                setLayout(null);
 
+                ok.setBounds(10 ,0,150,50);
+                add(ok);
+
+                setTitle("회원가입완료");
+                setSize(150, 100);
+                setVisible(true);
 
             } catch (SQLException e1) {
                 e1.printStackTrace();
